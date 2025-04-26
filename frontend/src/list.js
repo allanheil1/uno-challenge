@@ -16,22 +16,28 @@ import {
 } from "@mui/material";
 import { Delete as DeleteIcon, Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon } from "@mui/icons-material";
 import AddTaskDialog from "./components/addTaskDialog";
+import { useSnackbar } from "./context/SnackbarContext";
 
 export default function List() {
-  //Estados React
+  // Estados React
   const [itemName, setItemName] = useState(""); // Para adicionar novas tarefas
   const [filterName, setFilterName] = useState(""); // Para filtrar as tarefas pelo nome
   const [editingItem, setEditingItem] = useState(null); // Para controlar a edição do item
   const [openDialog, setOpenDialog] = useState(false); // Para controlar a exibição do Dialog de adicionar item
 
-  //Queries
-  // Utilizando useLazyQuery para que a query seja disparada ao clicar no botão
-  const [getTodoList, { data: listResponse, loading: loadingList, error, refetch }] = useLazyQuery(GET_TODO_LIST);
+  // Queries
+  const [getTodoList, { data: tarefasResponse, loading: loadingTarefas, error: errorTarefas, refetch: refetchTarefas }] =
+    useLazyQuery(GET_TODO_LIST, {
+      fetchPolicy: "no-cache",
+    });
 
-  //Mutations
+  // Mutations
   const [addItem] = useMutation(ADD_ITEM_MUTATION);
   const [updateItem] = useMutation(UPDATE_ITEM_MUTATION);
   const [deleteItem] = useMutation(DELETE_ITEM_MUTATION);
+
+  // Context
+  const { openSnackbar } = useSnackbar();
 
   // Chamada p/ adicionar um item à lista
   const handleAddItem = async () => {
@@ -39,10 +45,45 @@ export default function List() {
 
     await addItem({
       variables: { values: { name: itemName } },
-      onCompleted: () => {
+      onCompleted: (data) => {
         setItemName("");
         setOpenDialog(false);
-        refetch();
+        refetchTarefas();
+        openSnackbar(data.addItem.message, data.addItem.status);
+      },
+      onError: (err) => {
+        openSnackbar("Ocorreu um erro ao adicionar a tarefa", "error");
+      },
+    });
+  };
+
+  // Chamada p/ editar um item
+  const handleSaveEdit = async () => {
+    if (!editingItem.name) return;
+
+    await updateItem({
+      variables: { values: { id: editingItem.id, name: editingItem.name } },
+      onCompleted: (data) => {
+        setEditingItem(null);
+        refetchTarefas();
+        openSnackbar(data.updateItem.message, data.updateItem.status);
+      },
+      onError: (err) => {
+        openSnackbar("Ocorreu um erro ao atualizar a tarefa", "error");
+      },
+    });
+  };
+
+  // Chamada p/ excluir um item
+  const handleDeleteItem = async (id) => {
+    await deleteItem({
+      variables: { id },
+      onCompleted: (data) => {
+        refetchTarefas();
+        openSnackbar(data.deleteItem.message, data.deleteItem.status);
+      },
+      onError: (err) => {
+        openSnackbar("Ocorreu um erro ao excluir a tarefa", "error");
       },
     });
   };
@@ -52,36 +93,13 @@ export default function List() {
     setEditingItem({ id, name });
   };
 
-  // Chamada p/ editar um item
-  const handleSaveEdit = async () => {
-    if (!editingItem.name) return;
-
-    await updateItem({
-      variables: { values: { id: editingItem.id, name: editingItem.name } },
-      onCompleted: () => {
-        setEditingItem(null);
-        refetch();
-      },
-    });
-  };
-
-  // Chamada p/ excluir um item
-  const handleDeleteItem = async (id) => {
-    await deleteItem({
-      variables: { id },
-      onCompleted: () => {
-        refetch();
-      },
-    });
-  };
-
   // Alterar o campo de filtro
   const handleFilterChange = (event) => {
-    setFilterName(event.target.value); // Atualiza o valor do filtro enquanto digita
+    setFilterName(event.target.value);
   };
 
+  // Chamada do botão Buscar
   const handleFilterClick = () => {
-    // Ao clicar no botão "Buscar", chama a query passando o valor do filtro
     getTodoList({ variables: { filter: { name: filterName } } });
   };
 
@@ -93,7 +111,7 @@ export default function List() {
     setOpenDialog(false);
   };
 
-  // useEffect que garante que ao renderizar o componente, chamaremos a query de listagem
+  // useEffect que garante a primeira busca de tarefas
   useEffect(() => {
     getTodoList({ variables: { filter: { name: filterName } } });
   }, []);
@@ -114,13 +132,13 @@ export default function List() {
 
       <Button variant="contained" onClick={handleOpenDialog} sx={{ width: "100%", height: 40 }}>
         <Typography color="textColor.main" fontSize={14}>
-          + ADICIONAR TAREFA
+          + ADICIONAR
         </Typography>
       </Button>
 
       <Box sx={{ display: "flex", columnGap: 4, alignItems: "center" }}>
         <TextField
-          placeholder={"Buscar Tarefas..."}
+          placeholder={"Filtrar por nome..."}
           value={filterName}
           onChange={handleFilterChange}
           variant="outlined"
@@ -140,14 +158,14 @@ export default function List() {
 
       <Card variant="elevation" elevation={4} sx={{ maxHeight: "60vh", borderRadius: 2, overflow: "auto" }}>
         <ListMui>
-          {loadingList ? (
+          {loadingTarefas ? (
             <Box>Buscando...</Box>
-          ) : error ? (
-            <Box>Erro: {error.message}</Box>
-          ) : listResponse?.todoList?.length === 0 ? (
+          ) : errorTarefas ? (
+            <Box>Erro: {errorTarefas.message}</Box>
+          ) : tarefasResponse?.todoList?.length === 0 ? (
             <Typography sx={{ textAlign: "center", padding: 4 }}>Nenhuma tarefa encontrada</Typography>
           ) : (
-            listResponse?.todoList?.map((item) => (
+            tarefasResponse?.todoList?.map((item) => (
               <ListItem sx={{ p: 1, mb: 1, maxWidth: "500px" }} key={item.id}>
                 <ListItemButton>
                   {editingItem && editingItem.id === item.id ? (
@@ -160,7 +178,12 @@ export default function List() {
                         sx={{ width: "100%" }}
                       />
                       <Tooltip title="Salvar tarefa" arrow>
-                        <IconButton color="primary" onClick={handleSaveEdit} sx={{ minWidth: 0, marginLeft: 1 }}>
+                        <IconButton
+                          color="primary"
+                          onClick={handleSaveEdit}
+                          sx={{ minWidth: 0, marginLeft: 1 }}
+                          disabled={editingItem && editingItem.name.length === 0}
+                        >
                           <SaveIcon />
                         </IconButton>
                       </Tooltip>
