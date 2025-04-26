@@ -1,23 +1,28 @@
 import { createTheme } from "@mui/material/styles";
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#66ccaa",
+const theme = (mode) =>
+  createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: "#66ccaa",
+      },
+      secondary: {
+        main: "#66d7f2",
+      },
+      tertiary: {
+        main: "#66bbe4",
+      },
+      white: {
+        main: "#ffffff",
+      },
+      background: {
+        default: mode === "dark" ? "#071017" : "#fcfcfc",
+      },
     },
-    secondary: {
-      main: "#66d7f2",
+    typography: {
+      fontFamily: '"Montserrat", "Helvetica", "Arial", sans-serif',
     },
-    tertiary: {
-      main: "#66bbe4",
-    },
-    white: {
-      main: "#ffffff",
-    },
-    background: {
-      default: "#fcfcfc",
-    },
-  },
-});
+  });
 
 export default theme;

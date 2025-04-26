@@ -1,21 +1,42 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { Box, Button, TextField, Typography } from "@mui/material";
-import ListMui from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import { GET_TODO_LIST, ADD_ITEM_MUTATION, UPDATE_ITEM_MUTATION, DELETE_ITEM_MUTATION } from "./queries";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  List as ListMui,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+} from "@mui/material";
+import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 
 export default function List() {
-  const [itemName, setItemName] = useState("");
-  const [editingItem, setEditingItem] = useState(null);
-  const { data: listResponse, loading, error, refetch } = useQuery(GET_TODO_LIST);
+  const [itemName, setItemName] = useState(""); // Para adicionar novas tarefas
+  const [filterName, setFilterName] = useState(""); // Para filtrar as tarefas pelo nome
+  const [editingItem, setEditingItem] = useState(null); // Para controlar a edição do item
+  const [openDialog, setOpenDialog] = useState(false); // Para controlar a exibição do Dialog de adicionar item
+
+  const {
+    data: listResponse,
+    loading: loadingList,
+    error,
+    refetch,
+  } = useQuery(GET_TODO_LIST, {
+    variables: { filter: { name: filterName } }, // Passa o filtro de nome para a query
+  });
+
   const [addItem] = useMutation(ADD_ITEM_MUTATION);
   const [updateItem] = useMutation(UPDATE_ITEM_MUTATION);
   const [deleteItem] = useMutation(DELETE_ITEM_MUTATION);
 
+  // Função de chamada p/ adicionar um item à lista
   const handleAddItem = async () => {
     if (!itemName) return;
 
@@ -23,15 +44,18 @@ export default function List() {
       variables: { values: { name: itemName } },
       onCompleted: () => {
         setItemName("");
+        setOpenDialog(false);
         refetch();
       },
     });
   };
 
+  // Função para editar um item
   const handleEditItem = async (id, name) => {
     setEditingItem({ id, name });
   };
 
+  // Função de chamada p/ editar um item
   const handleSaveEdit = async () => {
     if (!editingItem.name) return;
 
@@ -44,6 +68,7 @@ export default function List() {
     });
   };
 
+  // Função de chamada p/ excluir um item
   const handleDeleteItem = async (id) => {
     await deleteItem({
       variables: { id },
@@ -53,32 +78,79 @@ export default function List() {
     });
   };
 
+  // Função para alterar o nome do filtro
+  const handleFilterChange = (event) => {
+    setFilterName(event.target.value); // Atualiza o valor do filtro enquanto digita
+  };
+
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
   return (
     <Box>
-      <Typography color="textColor.main" fontSize={38}>
-        Lista de Tarefas
+      <Typography
+        variant="h3"
+        sx={{
+          fontFamily: "'Montserrat', sans-serif",
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: 2,
+          marginBottom: "20px",
+        }}
+      >
+        LISTA DE TAREFAS
       </Typography>
 
       <Box display={"flex"} columnGap={4}>
         <TextField
           sx={{ color: "white" }}
-          label="Nova tarefa"
-          value={itemName}
-          onChange={(e) => setItemName(e.target.value)}
+          label="Buscar tarefas"
+          value={filterName}
+          onChange={handleFilterChange}
           variant="outlined"
+          fullWidth
         />
-        <Button disabled={itemName.length === 0} variant="contained" onClick={handleAddItem}>
+
+        <Button variant="contained" onClick={handleOpenDialog} sx={{ width: "100%" }}>
           <Typography color="textColor.main" fontSize={14}>
-            +Tarefa
+            + Tarefa
           </Typography>
         </Button>
       </Box>
 
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Adicionar Nova Tarefa</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            fullWidth
+            label="Nome da tarefa"
+            value={itemName}
+            onChange={(e) => setItemName(e.target.value)}
+            variant="outlined"
+            margin="normal"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="tertiary">
+            Cancelar
+          </Button>
+          <Button onClick={handleAddItem} color="primary" disabled={itemName.trim() === ""}>
+            Adicionar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <ListMui>
-        {loading ? (
-          <Box>Loading...</Box>
+        {loadingList ? (
+          <Box>Carregando...</Box>
         ) : error ? (
-          <Box>Error: {error.message}</Box>
+          <Box>Erro: {error.message}</Box>
         ) : (
           listResponse?.todoList?.map((item) => (
             <ListItem sx={{ border: 1, p: 1, mb: 1 }} key={item.id}>
