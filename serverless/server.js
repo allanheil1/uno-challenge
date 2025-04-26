@@ -29,9 +29,14 @@ type Query {
 }
 
 type Mutation {
-  addItem(values: ItemInput): Boolean
-  updateItem(values: ItemInput): Boolean
-  deleteItem(id: Int!): Boolean
+  addItem(values: ItemInput): ResponseMessage
+  updateItem(values: ItemInput): ResponseMessage
+  deleteItem(id: Int!): ResponseMessage
+}
+
+type ResponseMessage {
+  status: String
+  message: String
 }
 `;
 
