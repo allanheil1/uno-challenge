@@ -1,4 +1,6 @@
 import { ApolloClient, ApolloProvider, createHttpLink, InMemoryCache } from "@apollo/client";
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import theme from "./theme/theme";
 import { setContext } from "@apollo/client/link/context";
 import "./App.css";
 import List from "./list";
@@ -23,11 +25,14 @@ const client = new ApolloClient({
 function App() {
   return (
     <ApolloProvider client={client}>
-      <div className="App">
-        <header className="App-header">
-          <List />
-        </header>
-      </div>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div className="App">
+          <header className="App-header">
+            <List />
+          </header>
+        </div>
+      </ThemeProvider>
     </ApolloProvider>
   );
 }
