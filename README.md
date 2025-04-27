@@ -2,7 +2,7 @@
 
 ## Pontos importantes do Desenvolvedor
 
-Fala galera da UNO! Tudo bem? Gostaria de deixar claro que as implementações realizadas nesse projeto e descritas nesse documento visam demonstrar as principais ideias, tanto para o backend quanto para o frontend, que tive para a To Do List! Tenho ciência de que não se tratam de soluções extremamente robustas ou completas, tendo em vista a natureza do desafio. Ou seja, elas servem para dar ideia de alguns conceitos que conheço e que prezo serem indispensáveis para um bom código de software! Obrigado pela atenção.
+As implementações realizadas nesse projeto e descritas nesse documento visam demonstrar as principais ideias, tanto para o backend quanto para o frontend, que tive para a To Do List! Tenho ciência de que não se tratam de soluções extremamente robustas ou completas, tendo em vista a natureza do desafio. Ou seja, elas servem para dar ideia de alguns conceitos que conheço e que prezo serem indispensáveis para um bom código de software! Obrigado pela atenção.
 
 ## Visão Geral
 
@@ -78,72 +78,63 @@ Este projeto consiste em um gerenciador de tarefas, onde os usuários podem adic
 ```
 serverless
 ├── data
-│   └── makeData.js
+│   └── makeData.js             # Dados em memória (TODO_LIST)
 ├── graphql
-│   └── typeDefs.js
+│   └── typeDefs.js             # Definições do schema GraphQL
 ├── repositories
-│   └── taskRepository.js
+│   └── taskRepository.js       # CRUD puro sobre TODO_LIST
+├── services
+│   └── taskService.js          # Regras de negócio e validações antes do CRUD
 ├── resolvers
-│   ├── mutation.js
-│   └── query.js
+│   ├── query.js                # Resolvers de consulta (todoList)
+│   └── mutation.js             # Resolvers de mutação (add/update/delete/complete)
 ├── utils
-│   └── getRandomInt.js
+│   └── getRandomInt.js         # Geração de ID
 ├── validators
-│   └── validators.js
-├── errorHandler.js
-├── server.js
+│   └── validators.js           # Schemas Joi e validações customizadas
+├── errorHandler.js             # Tratamento centralizado de erros
+└── server.js                   # Inicialização do Apollo Server
 ```
 
-### Descrição dos Arquivos
+### 1. **data/makeData.js**
+- **Função**: Contém o array `TODO_LIST` em memória.
+- **Responsabilidade**: Base de dados em memória para desenvolvimento.
 
-#### 1. **data/makeData.js**
+### 2. **graphql/typeDefs.js**
+- **Função**: Define tipos e esquemas do GraphQL.
+- **Responsabilidade**: Estrutura de Queries e Mutations.
 
-- **Função**: Este arquivo contém os dados de exemplo utilizados pela aplicação. Ele define o array `TODO_LIST`, que armazena as tarefas criadas e manipuladas nas mutações (adicionar, editar, excluir tarefas).
-- **Responsabilidade**: Serve como uma base de dados em memória para fins de desenvolvimento. Futuramente, isso poderia ser substituído por uma solução de banco de dados real.
+### 3. **repositories/taskRepository.js**
+- **Função**: Operações CRUD puras sobre `TODO_LIST`.
+- **Responsabilidade**: Camada de repositório (Data Access).
 
-#### 2. **graphql/typeDefs.js**
+### 4. **services/taskService.js**
+- **Função**: Aplica regras de negócio e validações.
+- **Responsabilidade**: Camada de serviço (Business Logic).
 
-- **Função**: Define os tipos e esquemas do GraphQL (type definitions).
-- **Responsabilidade**: Contém as definições de tipos como `Item`, `ItemInput`, `ItemFilter`, e as mutações e consultas (queries) que a API aceita.
-- **Observação**: Define a estrutura da API GraphQL, facilitando a interação do frontend com o backend.
+### 5. **resolvers/query.js**
+- **Função**: Resolver de consultas (`todoList`).
+- **Responsabilidade**: Interface GraphQL para leitura de dados.
 
-#### 3. **repositories/taskRepository.js**
+### 6. **resolvers/mutation.js**
+- **Função**: Resolver de mutações (adicionar, atualizar, excluir, completar).
+- **Responsabilidade**: Interface GraphQL para alterações de dados.
 
-- **Função**: Implementa funções de manipulação de dados relacionadas às tarefas, como adicionar, atualizar, excluir e buscar tarefas.
-- **Responsabilidade**: Atua como a camada de repositório, isolando a lógica de manipulação de dados da camada de resolução (resolvers). Isso facilita a manutenção e a escalabilidade do código, pois permite alterar a fonte de dados (por exemplo, trocar o armazenamento de memória para um banco de dados) sem afetar a lógica de negócios.
+### 7. **utils/getRandomInt.js**
+- **Função**: Geração de IDs aleatórios.
+- **Responsabilidade**: Utilitário de apoio para unicidade.
 
-#### 4. **resolvers/mutation.js**
+### 8. **validators/validators.js**
+- **Função**: Schemas Joi e validações customizadas.
+- **Responsabilidade**: Sanitização e verificação de inputs.
 
-- **Função**: Contém a lógica das mutações GraphQL.
-- **Responsabilidade**: Lida com as operações de alteração de dados, como adicionar, atualizar e excluir tarefas.
-- **Função no fluxo**: Processa as solicitações do frontend para modificar os dados e utiliza funções do repositório para manipular o array `TODO_LIST`.
+### 9. **errorHandler.js**
+- **Função**: Tratamento centralizado de erros.
+- **Responsabilidade**: Formatação de respostas de erro.
 
-#### 5. **resolvers/query.js**
-
-- **Função**: Define os resolvers das consultas GraphQL.
-- **Responsabilidade**: Lida com as solicitações do frontend para obter dados, como listar todas as tarefas ou buscar tarefas com base em um filtro.
-- **Função no fluxo**: A consulta `todoList` processa a busca de tarefas, seja por nome ou sem filtro.
-
-#### 6. **utils/getRandomInt.js**
-
-- **Função**: Contém a função `getRandomInt()`, que gera um número aleatório.
-- **Responsabilidade**: Fornece um mecanismo simples para gerar IDs para as tarefas, que são únicos dentro da aplicação (sem um banco de dados real).
-
-#### 7. **validators/validators.js**
-
-- **Função**: Define funções de validação para os dados das tarefas.
-- **Responsabilidade**: Valida as entradas de dados, como garantir que o nome da tarefa tenha entre 3 e 100 caracteres e que o nome da tarefa não seja duplicado.
-- **Observação**: Isola a lógica de validação para que as mutações e o código de negócios fiquem mais limpos e fáceis de entender e manter.
-
-#### 8. **errorHandler.js**
-
-- **Função**: Contém a lógica para tratar erros na aplicação.
-- **Responsabilidade**: Captura e gera respostas de erro consistentes para o frontend. Utiliza as classes de erro customizadas (como `ValidationError`, `DuplicateError` e `NotFoundError`) para gerar mensagens e códigos de erro específicos para cada tipo de erro.
-
-#### 9. **server.js**
-
-- **Função**: Arquivo principal do servidor, responsável por inicializar o Apollo Server.
-- **Responsabilidade**: Configura o servidor GraphQL, define os `typeDefs`, `resolvers`, e inicia o servidor para escutar as requisições.
+### 10. **server.js**
+- **Função**: Inicialização do Apollo Server.
+- **Responsabilidade**: Ponto de entrada da aplicação.
 
 ---
 
