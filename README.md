@@ -2,7 +2,7 @@
 
 ## Pontos importantes do Desenvolvedor
 
-Fala galera da UNO! Tudo bem? Gostaria de deixar claro que as implementações realizadas nesse projeto e descritas nesse documento visam demonstrar as principais ideias, tanto para o backend quanto para o frontend, que tive para a To Do List! Tenho ciência de que não se tratam de soluções extremamente robustas ou completas, tendo em vista a natureza do desafio. Ou seja, elas servem para dar ideia de alaguns conceitos que conheço e que prezo serem indispensáveis para um bom código de software! Obrigado pela atenção.
+Fala galera da UNO! Tudo bem? Gostaria de deixar claro que as implementações realizadas nesse projeto e descritas nesse documento visam demonstrar as principais ideias, tanto para o backend quanto para o frontend, que tive para a To Do List! Tenho ciência de que não se tratam de soluções extremamente robustas ou completas, tendo em vista a natureza do desafio. Ou seja, elas servem para dar ideia de alguns conceitos que conheço e que prezo serem indispensáveis para um bom código de software! Obrigado pela atenção.
 
 ## Visão Geral
 
