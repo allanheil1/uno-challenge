@@ -1,9 +1,5 @@
 # UNO | Challenge
 
-## Pontos importantes do Desenvolvedor
-
-As implementações realizadas nesse projeto e descritas nesse documento visam demonstrar as principais ideias, tanto para o backend quanto para o frontend, que tive para a To Do List! Tenho ciência de que não se tratam de soluções extremamente robustas ou completas, tendo em vista a natureza do desafio. Ou seja, elas servem para dar ideia de alguns conceitos que conheço e que prezo serem indispensáveis para um bom código de software! Obrigado pela atenção.
-
 ## Visão Geral
 
 Este projeto consiste em um gerenciador de tarefas, onde os usuários podem adicionar, atualizar, excluir e listar/filtrar tarefas. O projeto foi desenvolvido utilizando o **Apollo Server** para GraphQL, com validações de entrada, tratamento de erros e boas práticas de arquitetura. O frontend foi desenvolvido com **React** e **Apollo Client**, com suporte à temas dinâmicos e mensagens de erro interativas através de um sistema de Snackbar.
