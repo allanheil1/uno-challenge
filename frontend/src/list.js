@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_TODO_LIST, ADD_ITEM_MUTATION, UPDATE_ITEM_MUTATION, DELETE_ITEM_MUTATION } from "./queries";
+import { GET_TODO_LIST, ADD_ITEM_MUTATION, UPDATE_ITEM_MUTATION, DELETE_ITEM_MUTATION, COMPLETE_ITEM_MUTATION } from "./queries";
+import { useSnackbar } from "./context/SnackbarContext";
 import {
   Box,
   Button,
@@ -13,10 +14,11 @@ import {
   Card,
   Tooltip,
   IconButton,
+  Checkbox,
 } from "@mui/material";
 import { Delete as DeleteIcon, Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon } from "@mui/icons-material";
 import AddTaskDialog from "./components/addTaskDialog";
-import { useSnackbar } from "./context/SnackbarContext";
+import ConfirmationDialog from "./components/confirmationDialog";
 
 export default function List() {
   // Estados React
@@ -24,6 +26,9 @@ export default function List() {
   const [filterName, setFilterName] = useState(""); // Para filtrar as tarefas pelo nome
   const [editingItem, setEditingItem] = useState(null); // Para controlar a edição do item
   const [openDialog, setOpenDialog] = useState(false); // Para controlar a exibição do Dialog de adicionar item
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // Para controlar o modal de confirmação
+  const [selectedTask, setSelectedTask] = useState(null); // Tarefa selecionada para marcar como completa
+  const [actionType, setActionType] = useState(null);
 
   // Queries
   const [getTodoList, { data: tarefasResponse, loading: loadingTarefas, error: errorTarefas, refetch: refetchTarefas }] =
@@ -35,6 +40,7 @@ export default function List() {
   const [addItem] = useMutation(ADD_ITEM_MUTATION);
   const [updateItem] = useMutation(UPDATE_ITEM_MUTATION);
   const [deleteItem] = useMutation(DELETE_ITEM_MUTATION);
+  const [completeItem] = useMutation(COMPLETE_ITEM_MUTATION);
 
   // Context
   const { openSnackbar } = useSnackbar();
@@ -81,9 +87,11 @@ export default function List() {
       onCompleted: (data) => {
         refetchTarefas();
         openSnackbar(data.deleteItem.message, data.deleteItem.status);
+        setOpenConfirmDialog(false);
       },
       onError: (err) => {
         openSnackbar("Ocorreu um erro ao excluir a tarefa", "error");
+        setOpenConfirmDialog(false);
       },
     });
   };
@@ -91,6 +99,22 @@ export default function List() {
   // Editar um item
   const handleEditItem = async (id, name) => {
     setEditingItem({ id, name });
+  };
+
+  // Chamada p/ marcar um item como completo
+  const handleCompleteItem = async (id) => {
+    await completeItem({
+      variables: { id },
+      onCompleted: (data) => {
+        refetchTarefas();
+        openSnackbar(data.completeItem.message, data.completeItem.status);
+        setOpenConfirmDialog(false); // Fecha o modal após a confirmação
+      },
+      onError: (err) => {
+        openSnackbar("Ocorreu um erro ao concluir a tarefa", "error");
+        setOpenConfirmDialog(false);
+      },
+    });
   };
 
   // Alterar o campo de filtro
@@ -109,6 +133,27 @@ export default function List() {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
+  };
+
+  // Função para abrir o modal de confirmação
+  const handleOpenConfirmDialog = (task, type) => {
+    setSelectedTask(task); // Salva a tarefa selecionada
+    setActionType(type); // Define o tipo da ação (completar ou excluir)
+    setOpenConfirmDialog(true); // Abre o modal
+  };
+
+  // Função para fechar o modal de confirmação
+  const handleCloseConfirmDialog = (_event, reason) => {
+    if (reason === "backdropClick" || reason === "escapeKeyDown") {
+      return;
+    }
+    setOpenConfirmDialog(false);
+  };
+
+  //Após o modal sumir, limpa os campos de task selecionada e actiontype
+  const handleExitedConfirmDialog = () => {
+    setSelectedTask(null);
+    setActionType(null);
   };
 
   // useEffect que garante a primeira busca de tarefas
@@ -168,6 +213,17 @@ export default function List() {
             tarefasResponse?.todoList?.map((item) => (
               <ListItem sx={{ p: 1, mb: 1, maxWidth: "500px" }} key={item.id}>
                 <ListItemButton>
+                  <Tooltip title={!item.completed ? "Concluir tarefa" : "Tarefa concluída"}>
+                    <Checkbox
+                      checked={item.completed}
+                      onChange={() => {
+                        if (!item.completed) {
+                          handleOpenConfirmDialog(item, "complete");
+                        }
+                      }}
+                    />
+                  </Tooltip>
+
                   {editingItem && editingItem.id === item.id ? (
                     <>
                       <TextField
@@ -204,7 +260,7 @@ export default function List() {
                     </Tooltip>
                   ) : null}
                   <Tooltip title="Excluir tarefa" arrow>
-                    <IconButton onClick={() => handleDeleteItem(item.id)} sx={{ ml: 2, p: 0 }}>
+                    <IconButton onClick={() => handleOpenConfirmDialog(item, "delete")} sx={{ ml: 2, p: 0 }}>
                       <DeleteIcon />
                     </IconButton>
                   </Tooltip>
@@ -221,6 +277,20 @@ export default function List() {
         onAdd={handleAddItem}
         itemName={itemName}
         setItemName={setItemName}
+      />
+
+      <ConfirmationDialog
+        open={openConfirmDialog}
+        onClose={handleCloseConfirmDialog}
+        onConfirm={() => {
+          if (actionType === "complete") {
+            handleCompleteItem(selectedTask.id);
+          } else if (actionType === "delete") {
+            handleDeleteItem(selectedTask.id);
+          }
+        }}
+        onExited={handleExitedConfirmDialog}
+        actionType={actionType}
       />
     </Box>
   );
