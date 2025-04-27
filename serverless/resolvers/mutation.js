@@ -86,14 +86,16 @@ function deleteTaskResolver(_, { id }, { TODO_LIST }) {
  * @returns {Object} - Status e mensagem
  */
 function completeTaskResolver(_, { id }, { TODO_LIST }) {
-  validateItemFound(id, TODO_LIST);
-
-  completeTask(id); // Marca a tarefa como concluída
-
-  return {
-    status: "success",
-    message: "Tarefa concluída com sucesso!",
-  };
+  try {
+    validateItemFound(id, TODO_LIST);
+    completeTask(id);
+    return {
+      status: "success",
+      message: "Tarefa concluída com sucesso!",
+    };
+  } catch (err) {
+    return errorHandler(err);
+  }
 }
 
 module.exports = {
