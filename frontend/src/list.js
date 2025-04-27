@@ -182,7 +182,7 @@ export default function List() {
                           color="primary"
                           onClick={handleSaveEdit}
                           sx={{ minWidth: 0, marginLeft: 1 }}
-                          disabled={editingItem && editingItem.name.length === 0}
+                          disabled={editingItem && editingItem.name.trim() === ""}
                         >
                           <SaveIcon />
                         </IconButton>

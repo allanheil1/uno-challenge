@@ -1,4 +1,5 @@
-const errorHandler = require("../errorHandler"); // Importando o erroHandler
+const { errorHandler } = require("../errorHandler");
+const { validateTaskName, validateTaskExists, validateItemFound } = require("../validators/validators");
 
 /**
  * Adiciona um item à lista de tarefas.
@@ -10,19 +11,12 @@ const errorHandler = require("../errorHandler"); // Importando o erroHandler
  * @param {Object} context               – contexto injetado pelo Apollo
  * @param {Array}  context.TODO_LIST
  * @param {Function} context.getRandomInt
- * @returns {Object} – status e mensagem
- * @throws {Error}                      – caso não passe nas validações - o "name" for vazio ou duplicado
+ * @returns {Object} – status, mensagem e opcionalmente código de erro
  */
 function addItem(_, { values: { name } }, { TODO_LIST, getRandomInt }) {
   try {
-    if (!name || !name.trim()) {
-      throw new Error("O nome do item não pode ser vazio");
-    }
-
-    const exists = TODO_LIST.some((item) => item.name.toLowerCase() === name.trim().toLowerCase());
-    if (exists) {
-      throw new Error("Já existe um item com esse nome");
-    }
+    validateTaskName(name);
+    validateTaskExists(name, TODO_LIST);
 
     TODO_LIST.push({
       id: getRandomInt(),
@@ -34,7 +28,7 @@ function addItem(_, { values: { name } }, { TODO_LIST, getRandomInt }) {
       message: "Item adicionado com sucesso!",
     };
   } catch (err) {
-    return errorHandler(err); // Passa o erro pelo handler
+    return errorHandler(err);
   }
 }
 
@@ -44,20 +38,14 @@ function addItem(_, { values: { name } }, { TODO_LIST, getRandomInt }) {
  * @param {any}    _
  * @param {{ values: { id: number, name: string } }} args
  * @param {{ TODO_LIST: Array }} context
- * @returns {Object} – status e mensagem
- * @throws {Error} – se id não existir ou "name" for vazio
+ * @returns {Object} – status, mensagem e opcionalmente código de erro
  */
 function updateItem(_, { values: { id, name } }, { TODO_LIST }) {
   try {
-    if (!name || !name.trim()) {
-      throw new Error("O nome do item não pode ser vazio");
-    }
+    validateItemFound(id, TODO_LIST);
+    validateTaskName(name);
 
     const idx = TODO_LIST.findIndex((item) => item.id === id);
-    if (idx === -1) {
-      throw new Error("Item não encontrado");
-    }
-
     TODO_LIST[idx].name = name.trim();
 
     return {
@@ -65,7 +53,7 @@ function updateItem(_, { values: { id, name } }, { TODO_LIST }) {
       message: "Item atualizado com sucesso!",
     };
   } catch (err) {
-    return errorHandler(err); // Passa o erro pelo handler
+    return errorHandler(err);
   }
 }
 
@@ -75,28 +63,23 @@ function updateItem(_, { values: { id, name } }, { TODO_LIST }) {
  * @param {any} _
  * @param {{ id: number }} args – objeto com o id a remover
  * @param {{ TODO_LIST: Array }} context
- * @returns {Object} – status e mensagem
- * @throws {Error} – se não encontrar item com esse id
+ * @returns {Object} – status, mensagem e opcionalmente código de erro
  */
 function deleteItem(_, { id }, { TODO_LIST }) {
   try {
-    const before = TODO_LIST.length;
+    validateItemFound(id, TODO_LIST);
 
     const filtered = TODO_LIST.filter((item) => item.id !== id);
 
     TODO_LIST.length = 0;
     TODO_LIST.push(...filtered);
 
-    if (filtered.length === before) {
-      throw new Error("Item não encontrado para remoção");
-    }
-
     return {
       status: "success",
       message: "Item removido com sucesso!",
     };
   } catch (err) {
-    return errorHandler(err); // Passa o erro pelo handler
+    return errorHandler(err);
   }
 }
 

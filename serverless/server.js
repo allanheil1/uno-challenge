@@ -1,6 +1,6 @@
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
-const { TODO_LIST } = require("./makeData");
+const { TODO_LIST } = require("./data/makeData");
 const queryResolvers = require("./resolvers/query");
 const mutationResolvers = require("./resolvers/mutation");
 

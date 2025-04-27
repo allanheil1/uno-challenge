@@ -21,7 +21,7 @@ export default function AddTaskDialog({ open, onClose, onAdd, itemName, setItemN
           CANCELAR
         </Button>
         <Button onClick={onAdd} color="primary" disabled={itemName.trim() === ""}>
-          ADICIONAR
+          SALVAR
         </Button>
       </DialogActions>
     </Dialog>
