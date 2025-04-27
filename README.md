@@ -1,4 +1,4 @@
-# README - Desafio de Implementação de API de Tarefas
+# UNO | Challenge
 
 ## Pontos importantes do Desenvolvedor
 
