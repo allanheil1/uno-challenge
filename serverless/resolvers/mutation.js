@@ -1,5 +1,6 @@
 const { errorHandler } = require("../errorHandler");
 const { validateTaskName, validateTaskExists, validateItemFound } = require("../validators/validators");
+const { addTask, updateTask, deleteTask } = require("../repositories/taskRepository"); // Importando o repositório
 
 /**
  * Adiciona um item à lista de tarefas.
@@ -13,15 +14,12 @@ const { validateTaskName, validateTaskExists, validateItemFound } = require("../
  * @param {Function} context.getRandomInt
  * @returns {Object} – status, mensagem e opcionalmente código de erro
  */
-function addItem(_, { values: { name } }, { TODO_LIST, getRandomInt }) {
+function addTaskResolver(_, { values: { name } }, { TODO_LIST, getRandomInt }) {
   try {
     validateTaskName(name);
     validateTaskExists(name, TODO_LIST);
 
-    TODO_LIST.push({
-      id: getRandomInt(),
-      name: name.trim(),
-    });
+    addTask(name, getRandomInt);
 
     return {
       status: "success",
@@ -33,20 +31,19 @@ function addItem(_, { values: { name } }, { TODO_LIST, getRandomInt }) {
 }
 
 /**
- * Atualiza o nome de um item existente.
+ * Atualiza o nome de uma tarefa existente.
  *
  * @param {any}    _
  * @param {{ values: { id: number, name: string } }} args
  * @param {{ TODO_LIST: Array }} context
  * @returns {Object} – status, mensagem e opcionalmente código de erro
  */
-function updateItem(_, { values: { id, name } }, { TODO_LIST }) {
+function updateTaskResolver(_, { values: { id, name } }, { TODO_LIST }) {
   try {
     validateItemFound(id, TODO_LIST);
     validateTaskName(name);
 
-    const idx = TODO_LIST.findIndex((item) => item.id === id);
-    TODO_LIST[idx].name = name.trim();
+    updateTask(id, name);
 
     return {
       status: "success",
@@ -65,14 +62,11 @@ function updateItem(_, { values: { id, name } }, { TODO_LIST }) {
  * @param {{ TODO_LIST: Array }} context
  * @returns {Object} – status, mensagem e opcionalmente código de erro
  */
-function deleteItem(_, { id }, { TODO_LIST }) {
+function deleteTaskResolver(_, { id }, { TODO_LIST }) {
   try {
     validateItemFound(id, TODO_LIST);
 
-    const filtered = TODO_LIST.filter((item) => item.id !== id);
-
-    TODO_LIST.length = 0;
-    TODO_LIST.push(...filtered);
+    deleteTask(id);
 
     return {
       status: "success",
@@ -84,7 +78,7 @@ function deleteItem(_, { id }, { TODO_LIST }) {
 }
 
 module.exports = {
-  addItem,
-  updateItem,
-  deleteItem,
+  addTaskResolver,
+  updateTaskResolver,
+  deleteTaskResolver,
 };

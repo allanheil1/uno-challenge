@@ -1,3 +1,5 @@
+const { getTasksByName } = require("../repositories/taskRepository");
+
 /**
  * Retorna a lista de itens, opcionalmente filtrada por um nome (case-insensitive).
  *
@@ -6,15 +8,14 @@
  * @param {{ TODO_LIST: Array }} context
  * @returns {Array<{id: number, name: string}>}
  */
-function todoList(_, { filter }, { TODO_LIST }) {
+function getTasksResolver(_, { filter }, { TODO_LIST }) {
   if (filter && filter.name) {
-    const term = filter.name.toLowerCase().trim();
-    return TODO_LIST.filter((item) => item.name.toLowerCase().includes(term));
+    return getTasksByName(filter.name);
   }
 
   return TODO_LIST;
 }
 
 module.exports = {
-  todoList,
+  getTasksResolver,
 };
