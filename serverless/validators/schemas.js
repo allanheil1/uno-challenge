@@ -1,5 +1,5 @@
 const Joi = require("joi");
-const { ValidationError } = require("../errorHandler");
+const { ValidationError } = require("../common/errors");
 
 // Schema para requisição de “addItem”
 const addTaskSchema = Joi.object({

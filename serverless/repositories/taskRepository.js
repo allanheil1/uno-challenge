@@ -1,5 +1,5 @@
 const { TODO_LIST } = require("../data/makeData");
-const { DuplicateError, NotFoundError } = require("../errorHandler");
+const { DuplicateError, NotFoundError } = require("../common/errors");
 
 /**
  * Valida se já existe um item com o mesmo nome.

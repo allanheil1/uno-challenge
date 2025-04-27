@@ -1,4 +1,4 @@
-const { errorHandler } = require("../errorHandler");
+const { errorHandler } = require("../common/errors");
 const {
   validateAddTaskInput,
   validateUpdateTaskInput,
