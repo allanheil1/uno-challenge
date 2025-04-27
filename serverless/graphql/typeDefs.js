@@ -2,6 +2,7 @@ const typeDefs = `#graphql
 type Item {
   id: Int
   name: String
+  completed: Boolean
 }
 
 input ItemInput {
@@ -22,6 +23,7 @@ type Mutation {
   addItem(values: ItemInput): ResponseMessage
   updateItem(values: ItemInput): ResponseMessage
   deleteItem(id: Int!): ResponseMessage
+  completeItem(id: Int!): ResponseMessage 
 }
 
 type ResponseMessage {

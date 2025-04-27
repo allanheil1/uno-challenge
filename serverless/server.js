@@ -17,6 +17,7 @@ async function startServer() {
         addItem: mutationResolvers.addTaskResolver,
         updateItem: mutationResolvers.updateTaskResolver,
         deleteItem: mutationResolvers.deleteTaskResolver,
+        completeItem: mutationResolvers.completeTaskResolver,
       },
     },
   });

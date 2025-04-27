@@ -1,6 +1,6 @@
 const { errorHandler } = require("../errorHandler");
 const { validateTaskName, validateTaskExists, validateItemFound } = require("../validators/validators");
-const { addTask, updateTask, deleteTask } = require("../repositories/taskRepository"); // Importando o repositório
+const { addTask, updateTask, deleteTask, completeTask } = require("../repositories/taskRepository");
 
 /**
  * Adiciona um item à lista de tarefas.
@@ -77,8 +77,28 @@ function deleteTaskResolver(_, { id }, { TODO_LIST }) {
   }
 }
 
+/**
+ * Marca uma tarefa como concluída.
+ *
+ * @param {any} _ - Parâmetro padrão do Apollo
+ * @param {Object} args - Contém os dados para completar a tarefa (id)
+ * @param {Array} TODO_LIST - A lista de tarefas
+ * @returns {Object} - Status e mensagem
+ */
+function completeTaskResolver(_, { id }, { TODO_LIST }) {
+  validateItemFound(id, TODO_LIST);
+
+  completeTask(id); // Marca a tarefa como concluída
+
+  return {
+    status: "success",
+    message: "Tarefa concluída com sucesso!",
+  };
+}
+
 module.exports = {
   addTaskResolver,
   updateTaskResolver,
   deleteTaskResolver,
+  completeTaskResolver,
 };

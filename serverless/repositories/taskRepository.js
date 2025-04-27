@@ -2,63 +2,79 @@ const { TODO_LIST } = require("../data/makeData");
 const { NotFoundError } = require("../errorHandler");
 
 /**
- * Adiciona um item à lista TODO_LIST.
+ * Adiciona uma tarefa à lista TODO_LIST.
  *
  * @param {string} name - Nome da tarefa que será adicionada.
  * @param {Function} getRandomInt - Função para gerar um ID aleatório.
- * @returns {Object} - Retorna o item adicionado com id e nome.
+ * @returns {Object} - Retorna a tarefa adicionado com id e nome.
  */
 const addTask = (name, getRandomInt) => {
-  // Cria um novo item com id aleatório e nome fornecido
-  const newItem = {
+  // Cria uma nova tarefa com id aleatório e nome fornecido
+  const newTask = {
     id: getRandomInt(),
     name: name.trim(),
+    completed: false,
   };
-  TODO_LIST.push(newItem); // Adiciona o item na lista
-  return newItem; // Retorna o item adicionado
+  TODO_LIST.push(newTask); // Adiciona a tarefa na lista
+  return newTask; // Retorna a tarefa adicionada
 };
 
 /**
- * Atualiza o nome de um item existente na lista TODO_LIST.
+ * Atualiza o nome de uma tarefa existente na lista TODO_LIST.
  *
- * @param {number} id - ID do item a ser atualizado.
- * @param {string} name - Novo nome para o item.
- * @returns {Object} - Retorna o item atualizado com id e novo nome.
+ * @param {number} id - ID da tarefa a ser atualizado.
+ * @param {string} name - Novo nome para a tarefa.
+ * @returns {Object} - Retorna a tarefa atualizada com id e novo nome.
  */
 const updateTask = (id, name) => {
   const itemIndex = TODO_LIST.findIndex((item) => item.id === id);
   if (itemIndex === -1) {
     throw new NotFoundError("Item não encontrado");
   }
-  // Atualiza o nome do item
+  // Atualiza o nome da tarefa
   TODO_LIST[itemIndex].name = name.trim();
-  return TODO_LIST[itemIndex]; // Retorna o item atualizado
+  return TODO_LIST[itemIndex]; // Retorna a tarefa atualizada
 };
 
 /**
- * Exclui um item da lista TODO_LIST pelo ID.
+ * Marca uma tarefa como completa.
  *
- * @param {number} id - ID do item a ser excluído.
- * @returns {Object} - Retorna o item excluído.
+ * @param {number} id - ID da tarefa a ser atualizada.
+ * @returns {Object} - Retorna a tarefa atualizada.
+ */
+const completeTask = (id) => {
+  const itemIndex = TODO_LIST.findIndex((item) => item.id === id);
+  if (itemIndex === -1) {
+    throw new NotFoundError("Item não encontrado");
+  }
+  // Marca como completa
+  TODO_LIST[itemIndex].completed = true;
+  return TODO_LIST[itemIndex]; // Retorna a tarefa atualizada
+};
+
+/**
+ * Exclui uma tarefa da lista TODO_LIST pelo ID.
+ *
+ * @param {number} id - ID da tarefa a ser excluída.
+ * @returns {Object} - Retorna a tarefa excluída.
  */
 const deleteTask = (id) => {
   const itemIndex = TODO_LIST.findIndex((item) => item.id === id);
   if (itemIndex === -1) {
     throw new NotFoundError("Item não encontrado para remoção");
   }
-  // Remove o item da lista
-  const deletedItem = TODO_LIST.splice(itemIndex, 1)[0]; // Remove e retorna o item excluído
-  return deletedItem; // Retorna o item excluído
+  // Remove a tarefa da lista
+  const deletedItem = TODO_LIST.splice(itemIndex, 1)[0];
+  return deletedItem;
 };
 
 /**
- * Filtra os itens da lista TODO_LIST com base no nome.
+ * Filtra as tarefas da lista TODO_LIST com base no nome.
  *
  * @param {string} filterName - Nome da tarefa para filtrar.
- * @returns {Array} - Lista filtrada de itens.
+ * @returns {Array} - Lista filtrada de tarefas.
  */
 const getTasksByName = (filterName) => {
-  // Filtra os itens da lista TODO_LIST, caso o nome corresponda ao termo de pesquisa
   return TODO_LIST.filter((item) => item.name.toLowerCase().includes(filterName.toLowerCase().trim()));
 };
 
@@ -67,4 +83,5 @@ module.exports = {
   updateTask,
   deleteTask,
   getTasksByName,
+  completeTask,
 };
