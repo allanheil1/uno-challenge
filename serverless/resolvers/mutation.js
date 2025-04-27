@@ -1,6 +1,5 @@
 const { errorHandler } = require("../errorHandler");
-const { validateTaskName, validateTaskExists, validateItemFound } = require("../validators/validators");
-const { addTask, updateTask, deleteTask, completeTask } = require("../repositories/taskRepository");
+const { addTaskService, updateTaskService, completeTaskService, deleteTaskService } = require("../services/taskService");
 
 /**
  * Adiciona um item à lista de tarefas.
@@ -14,16 +13,13 @@ const { addTask, updateTask, deleteTask, completeTask } = require("../repositori
  * @param {Function} context.getRandomInt
  * @returns {Object} – status, mensagem e opcionalmente código de erro
  */
-function addTaskResolver(_, { values: { name } }, { TODO_LIST, getRandomInt }) {
+async function addTaskResolver(_, { values: { name } }, { TODO_LIST, getRandomInt }) {
   try {
-    validateTaskName(name);
-    validateTaskExists(name, TODO_LIST);
-
-    addTask(name, getRandomInt);
-
+    addTaskService(name, TODO_LIST, getRandomInt);
     return {
       status: "success",
       message: "Item adicionado com sucesso!",
+      code: "OK",
     };
   } catch (err) {
     return errorHandler(err);
@@ -38,16 +34,13 @@ function addTaskResolver(_, { values: { name } }, { TODO_LIST, getRandomInt }) {
  * @param {{ TODO_LIST: Array }} context
  * @returns {Object} – status, mensagem e opcionalmente código de erro
  */
-function updateTaskResolver(_, { values: { id, name } }, { TODO_LIST }) {
+async function updateTaskResolver(_, { values: { id, name } }, { TODO_LIST }) {
   try {
-    validateItemFound(id, TODO_LIST);
-    validateTaskName(name);
-
-    updateTask(id, name);
-
+    updateTaskService(id, name, TODO_LIST);
     return {
       status: "success",
       message: "Item atualizado com sucesso!",
+      code: "OK",
     };
   } catch (err) {
     return errorHandler(err);
@@ -62,15 +55,13 @@ function updateTaskResolver(_, { values: { id, name } }, { TODO_LIST }) {
  * @param {{ TODO_LIST: Array }} context
  * @returns {Object} – status, mensagem e opcionalmente código de erro
  */
-function deleteTaskResolver(_, { id }, { TODO_LIST }) {
+async function deleteTaskResolver(_, { id }, { TODO_LIST }) {
   try {
-    validateItemFound(id, TODO_LIST);
-
-    deleteTask(id);
-
+    deleteTaskService(id, TODO_LIST);
     return {
       status: "success",
       message: "Item removido com sucesso!",
+      code: "OK",
     };
   } catch (err) {
     return errorHandler(err);
@@ -85,13 +76,13 @@ function deleteTaskResolver(_, { id }, { TODO_LIST }) {
  * @param {Array} TODO_LIST - A lista de tarefas
  * @returns {Object} - Status e mensagem
  */
-function completeTaskResolver(_, { id }, { TODO_LIST }) {
+async function completeTaskResolver(_, { id }, { TODO_LIST }) {
   try {
-    validateItemFound(id, TODO_LIST);
-    completeTask(id);
+    completeTaskService(id, TODO_LIST);
     return {
       status: "success",
       message: "Tarefa concluída com sucesso!",
+      code: "OK",
     };
   } catch (err) {
     return errorHandler(err);

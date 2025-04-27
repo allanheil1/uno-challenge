@@ -1,9 +1,9 @@
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
+const { typeDefs } = require("./graphql/typeDefs");
 const queryResolvers = require("./resolvers/query");
 const mutationResolvers = require("./resolvers/mutation");
 const { TODO_LIST } = require("./data/makeData");
-const { typeDefs } = require("./graphql/typeDefs");
 const { getRandomInt } = require("./utils/getRandomInt");
 
 async function startServer() {
@@ -24,7 +24,7 @@ async function startServer() {
 
   const { url } = await startStandaloneServer(server, {
     listen: { port: 4000 },
-    context: async () => ({ TODO_LIST, getRandomInt }),
+    context: () => ({ TODO_LIST, getRandomInt }),
   });
 
   console.log(`🚀 Server ready at ${url}`);

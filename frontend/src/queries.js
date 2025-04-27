@@ -19,6 +19,7 @@ export const ADD_ITEM_MUTATION = gql`
     addItem(values: $values) {
       status
       message
+      code
     }
   }
 `;
@@ -29,6 +30,7 @@ export const UPDATE_ITEM_MUTATION = gql`
     updateItem(values: $values) {
       status
       message
+      code
     }
   }
 `;
@@ -39,6 +41,7 @@ export const DELETE_ITEM_MUTATION = gql`
     deleteItem(id: $id) {
       status
       message
+      code
     }
   }
 `;
@@ -48,6 +51,7 @@ export const COMPLETE_ITEM_MUTATION = gql`
     completeItem(id: $id) {
       status
       message
+      code
     }
   }
 `;

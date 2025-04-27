@@ -81,7 +81,7 @@ const getTasksByName = (filterName) => {
 module.exports = {
   addTask,
   updateTask,
+  completeTask,
   deleteTask,
   getTasksByName,
-  completeTask,
 };

@@ -1,4 +1,4 @@
-const { getTasksByName } = require("../repositories/taskRepository");
+const { getTasksService } = require("../services/taskService");
 
 /**
  * Retorna a lista de itens, opcionalmente filtrada por um nome (case-insensitive).
@@ -9,11 +9,7 @@ const { getTasksByName } = require("../repositories/taskRepository");
  * @returns {Array<{id: number, name: string}>}
  */
 function getTasksResolver(_, { filter }, { TODO_LIST }) {
-  if (filter && filter.name) {
-    return getTasksByName(filter.name);
-  }
-
-  return TODO_LIST;
+  return getTasksService(filter, TODO_LIST);
 }
 
 module.exports = {
