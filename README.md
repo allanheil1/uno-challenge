@@ -104,4 +104,13 @@ yarn test
 npm test
 ```
 
+## Melhorias futuras
+
+Dentre possíveis melhorias a serem aplicadas nesse código para aprimorar sua esbalididade e robustez, estão:
+
+- Persistência de dados: substituir o makeData.js (in‐memory) por uma camada de persistência em, por exemplo, PostgreSQL;
+- Autenticação e segurança: utilizar JWT e injetar o usuário nos resolvers, permitindo lidar com casos de permissões (Ex.: quem pode alterar essa task?);
+- DevOps e CI/CD: Workflow de PR que roda lint, tests e build, deploy automático ao merge na branch master/main;
+- Monitoramento e observabilidade: implementar tecnologias de logging e tracking, como winston ou sentry para o backend.
+- 
 ---
