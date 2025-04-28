@@ -75,7 +75,7 @@ uno-challenge/
   - **Camada de Repositórios (`repositories/`)**: Encapsula acesso a dados, definindo métodos para CRUD e queries específicas, isolando as chamadas ao data layer (`taskRepository.js`).
 - **Testes Automatizados (Backend)**: adicionamos uma suíte de **testes de integração (end-to-end)** para os resolvers GraphQL, garantindo cobertura de cenários de sucesso e erro.
 
-## Como Rodar os testes
+## Como Rodar o projeto
 
 ### Frontend
 
@@ -95,11 +95,7 @@ yarn start  # inicia o GraphQL em http://localhost:4000/graphql
 
 ---
 
-## Testes Automatizados
-
-Adicionamos uma suíte de **testes de integração** para os resolvers GraphQL, garantindo cobertura de cenários de sucesso e erro.
-
-Para executar:
+## Como Rodar os testes
 
 ```bash
 cd serverless
