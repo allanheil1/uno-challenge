@@ -2,11 +2,7 @@
 
 ## Observações do desenvolvedor
 
-Para esse desafio foquei em implementar, mesmo que de forma simplificada, alguns dos mais importantes conceitos de boas práticas de código. No backend, separei o código em camadas, aplicando conceitos de validators, resolvers, services e repositories. No frontend componentizei dialogs, adicionei temas, tooltips, snackbars e alertas de feedback, entre outros...Abaixo você vai encontrar de forma mais detalhada a lista de implementações.
-
-## Visão Geral
-
-Este projeto é um fork do desafio técnico da UNO para criar um TODO List utilizando JavaScript, Node.js, GraphQL e React.
+Para esse desafio, foquei em implementar alguns dos mais importantes conceitos de boas práticas de código, adotando uma arquitetura limpa e uma estrutura de projeto bem definida, mas sem perder simplicidade e objetividade; também priorizei o tempo de entrega para cumprir o prazo. Abaixo, encontram-se a estrutura do projetos e a descrição de algumas das principais implementações.
 
 ## Estrutura do Projeto
 
