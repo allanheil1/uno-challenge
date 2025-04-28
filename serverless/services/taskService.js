@@ -13,6 +13,7 @@ function addTaskService(name, TODO_LIST, getRandomInt) {
  */
 function updateTaskService(id, name, TODO_LIST) {
   repo.validateItemFound(id, TODO_LIST);
+  repo.validateTaskExists(name, TODO_LIST);
   return repo.updateTask(id, name);
 }
 
